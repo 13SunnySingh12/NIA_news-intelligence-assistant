@@ -7,8 +7,8 @@
 services:
   ai-service:
     build:
-      context: ../ai-service
-      dockerfile: ../docker/ai-service.Dockerfile
+      context: ..
+      dockerfile: docker/ai-service.Dockerfile
     env_file: ../.env
     ports:
       - "8000:8000"
@@ -16,8 +16,8 @@ services:
 
   backend:
     build:
-      context: ../backend
-      dockerfile: ../docker/backend.Dockerfile
+      context: ..
+      dockerfile: docker/backend.Dockerfile
     env_file: ../.env
     environment:
       # Reach the AI service by its compose service name.

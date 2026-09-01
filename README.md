@@ -19,7 +19,7 @@ NIA/
 ├── frontend/      React app (Vite, JS/JSX, Tailwind)
 ├── backend/       Spring Boot API (Maven)
 ├── ai-service/    FastAPI AI service (embeddings, RAG)
-├── database/      schema.sql, rls.sql, seed_categories.sql, migrations/
+├── database/      schema.sql, rls.sql, migrations/
 ├── docker/        Dockerfiles + docker-compose for the two backends
 ├── docs/          architecture + provider notes
 ├── .env.example   every environment variable, documented
@@ -103,6 +103,18 @@ Open http://localhost:5173, create an account, and you're in.
 # set FASTAPI_BASE_URL=http://ai-service:8000 in .env first
 docker compose -f docker/docker-compose.yml up --build
 ```
+
+Both images build with the **repository root** as their context, so the single
+root `.dockerignore` governs both. Building either one directly uses the same
+context:
+
+```bash
+docker build -f docker/backend.Dockerfile -t nia-backend .
+```
+
+Neither image contains `.env`, source, tests, docs, or build output — the backend
+image is a JRE plus the jar, the AI service is the `app/` package plus its
+dependencies. Both run as an unprivileged user (`uid 10001`).
 
 ## 4. Tests
 

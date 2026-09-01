@@ -7,7 +7,7 @@ import java.util.Set;
 
 /**
  * Maps arbitrary provider category strings onto NIA's fixed category set.
- * The canonical list must stay in sync with database/seed_categories.sql and
+ * The canonical list must stay in sync with NIA_INGEST_CATEGORIES and
  * the frontend category list.
  */
 @Component

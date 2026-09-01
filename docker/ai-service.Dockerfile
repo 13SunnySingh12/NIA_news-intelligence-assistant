@@ -1,15 +1,17 @@
-# FastAPI AI service. Build context: ./ai-service
-# Build:  docker build -f docker/ai-service.Dockerfile -t nia-ai-service ./ai-service
+# FastAPI AI service.
+# Build context is the REPOSITORY ROOT so the single root .dockerignore applies
+# (Docker reads .dockerignore from the context root, not from the repo root).
+# Build:  docker build -f docker/ai-service.Dockerfile -t nia-ai-service .
 FROM python:3.12-slim
 WORKDIR /app
 
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1
 
-COPY requirements.txt .
+COPY ai-service/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app ./app
+COPY ai-service/app ./app
 
 # Run as an unprivileged user: the service only reads its own code and opens
 # port 8000, so root buys nothing and costs isolation.

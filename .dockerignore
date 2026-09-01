@@ -1,0 +1,104 @@
+# Single Docker ignore file for the whole repository.
+#
+# Docker resolves .dockerignore from the BUILD CONTEXT root, so both images are
+# built with the repository root as their context (see docker/docker-compose.yml)
+# and this one file governs both. Without that, a root-level file would be
+# silently ignored and each service would need its own copy.
+#
+# Everything here is either a secret, regenerated inside the image, or useless to
+# a running container. Nothing required to BUILD is excluded: backend/pom.xml,
+# backend/src, ai-service/requirements.txt and ai-service/app are all kept.
+
+# ---- Secrets: must never reach a build context or an image layer ----
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.local
+# .env.example is committed for humans; the image has no use for it.
+.env.example
+
+# ---- Version control ----
+.git
+.gitignore
+.gitattributes
+
+# ---- Node / frontend (the frontend deploys to Vercel, not into these images) ----
+node_modules
+**/node_modules
+frontend/dist
+frontend/coverage
+.vite
+*.local
+
+# ---- Java build output (the image runs its own `mvn package`) ----
+backend/target
+**/target
+*.class
+run
+
+# ---- Python venv + caches (host-specific binaries, useless in a linux image) ----
+.venv
+**/.venv
+venv
+**/venv
+__pycache__
+**/__pycache__
+*.py[cod]
+.pytest_cache
+**/.pytest_cache
+.mypy_cache
+.ruff_cache
+*.egg-info
+
+# ---- Tests: not needed at runtime ----
+ai-service/tests
+backend/src/test
+
+# ---- Docs and development-only material ----
+docs
+README.md
+database
+*.md
+!ai-service/app/**/*.md
+
+# ---- IDE / editor / assistant workspace state ----
+.vscode
+.idea
+*.iml
+.claude
+.aider*
+.cursor
+.continue
+.windsurf
+
+# ---- OS noise ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Logs, coverage, temp, backups ----
+*.log
+logs
+coverage
+htmlcov
+.coverage
+.coverage.*
+*.lcov
+*.bak
+*.orig
+*.rej
+*.tmp
+*~
+
+# ---- Local databases / Supabase local artifacts ----
+*.sqlite
+*.sqlite3
+*.db
+.supabase
+supabase/.temp
+supabase/.branches
+
+# ---- Docker's own files (not needed inside the image) ----
+docker/docker-compose.yml
+docker-compose.override.yml

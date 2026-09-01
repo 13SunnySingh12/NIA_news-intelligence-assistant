@@ -6,17 +6,34 @@
 
 ## Task -> provider routing
 
+Measured on the free tiers (5 identical one-sentence summarisation calls each):
+
+| Provider / model | Success | Avg latency |
+|---|---|---|
+| Groq `openai/gpt-oss-20b` | 5/5 | 525 ms |
+| OpenRouter `openrouter/free` | 4/5 | 3,267 ms |
+| Gemini `gemini-flash-latest` | 3/5 | 27,386 ms |
+| Gemini `gemini-3.5-flash` | 0/5 | quota exhausted (20 requests/day) |
+
+Groq is therefore the primary for every chat-style task. Gemini's free tier caps
+`gemini-3.5-flash` at 20 generate-content requests per day, which a news
+assistant exhausts almost immediately, so it sits last in the fallback chain.
+
+Embeddings stay on Gemini regardless: `articles.embedding` is `VECTOR(768)` and a
+different provider would emit a different vector size, invalidating every stored
+vector. The router deliberately refuses to fall back for embeddings.
+
 Each AI task uses the provider best suited to it, then walks the fallback chain
 (`AI_FALLBACK_PROVIDER`, comma-separated) if that provider fails. Provider order
-is configuration, not code — e.g. `AI_FALLBACK_PROVIDER=GROQ,OPENROUTER` makes
-chat run Gemini -> Groq -> OpenRouter.
+is configuration, not code — with `AI_CHAT_PROVIDER=GROQ` and
+`AI_FALLBACK_PROVIDER=OPENROUTER,GEMINI`, chat runs Groq -> OpenRouter -> Gemini.
 
 | Task | Provider | Base URL | Default model (override with env) |
 |---|---|---|---|
-| Chatbot (RAG) | Gemini | `https://generativelanguage.googleapis.com/v1beta` | `gemini-3.5-flash` (`GEMINI_CHAT_MODEL`) |
+| Chatbot (RAG) | Groq | `https://api.groq.com/openai/v1` | `openai/gpt-oss-20b` (`GROQ_MODEL`) |
 | Summarization | Groq | `https://api.groq.com/openai/v1` | `openai/gpt-oss-20b` (`GROQ_MODEL`) |
 | Embeddings | Gemini | `.../v1beta` | `gemini-embedding-001` @ 768 dims (`EMBED_MODEL` / `EMBED_DIM`) |
-| Fallback chain | Groq -> OpenRouter | see above | `AI_FALLBACK_PROVIDER=GROQ,OPENROUTER` |
+| Fallback chain | OpenRouter -> Gemini | see above | `AI_FALLBACK_PROVIDER=OPENROUTER,GEMINI` |
 
 Groq and OpenRouter speak the OpenAI
 chat-completions format (one shared client); Gemini uses its own

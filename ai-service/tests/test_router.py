@@ -34,7 +34,13 @@ def _router(providers):
     return router
 
 
-def test_chat_routes_to_gemini():
+def test_chat_routes_to_the_configured_primary(monkeypatch):
+    """Routing is configuration, so the test pins it rather than reading the
+    deployment's current .env — otherwise re-pointing a task at another provider
+    turns this suite red for no reason."""
+    monkeypatch.setattr(settings, "ai_chat_provider", "GEMINI")
+    monkeypatch.setattr(settings, "ai_fallback_provider", "OPENROUTER")
+
     gemini = _FakeProvider("GEMINI", result="from gemini")
     groq = _FakeProvider("GROQ", result="from groq")
     fallback = _FakeProvider("OPENROUTER", result="from openrouter")
@@ -44,7 +50,23 @@ def test_chat_routes_to_gemini():
     assert fallback.calls == 0  # primary succeeded; fallback untouched
 
 
-def test_summary_and_classify_route_to_groq():
+def test_chat_primary_is_swappable_by_configuration(monkeypatch):
+    """The same router must follow whichever provider is configured."""
+    monkeypatch.setattr(settings, "ai_chat_provider", "GROQ")
+    monkeypatch.setattr(settings, "ai_fallback_provider", "OPENROUTER,GEMINI")
+
+    gemini = _FakeProvider("GEMINI", result="from gemini")
+    groq = _FakeProvider("GROQ", result="from groq")
+    fallback = _FakeProvider("OPENROUTER", result="from openrouter")
+    router = _router({"GEMINI": gemini, "GROQ": groq, "OPENROUTER": fallback})
+
+    assert router.run("chat", [{"role": "user", "content": "hi"}]) == "from groq"
+    assert (fallback.calls, gemini.calls) == (0, 0)
+
+
+def test_summary_and_classify_route_to_groq(monkeypatch):
+    monkeypatch.setattr(settings, "ai_summary_provider", "GROQ")
+    monkeypatch.setattr(settings, "ai_classification_provider", "GROQ")
     gemini = _FakeProvider("GEMINI", result="from gemini")
     groq = _FakeProvider("GROQ", result="from groq")
     fallback = _FakeProvider("OPENROUTER", result="from openrouter")
@@ -54,7 +76,9 @@ def test_summary_and_classify_route_to_groq():
     assert router.run("classify", [{"role": "user", "content": "hi"}]) == "from groq"
 
 
-def test_falls_back_to_openrouter_on_transient_error():
+def test_falls_back_to_openrouter_on_transient_error(monkeypatch):
+    monkeypatch.setattr(settings, "ai_chat_provider", "GEMINI")
+    monkeypatch.setattr(settings, "ai_fallback_provider", "OPENROUTER")
     gemini = _FakeProvider("GEMINI", error=httpx.TimeoutException("timeout"))
     fallback = _FakeProvider("OPENROUTER", result="from openrouter")
     router = _router({"GEMINI": gemini, "OPENROUTER": fallback})
@@ -63,8 +87,10 @@ def test_falls_back_to_openrouter_on_transient_error():
     assert fallback.calls == 1
 
 
-def test_does_not_fall_back_on_client_error():
+def test_does_not_fall_back_on_client_error(monkeypatch):
     # A 400 means our request was malformed — switching providers must NOT happen.
+    monkeypatch.setattr(settings, "ai_chat_provider", "GEMINI")
+    monkeypatch.setattr(settings, "ai_fallback_provider", "OPENROUTER")
     gemini = _FakeProvider("GEMINI", error=_http_error(400))
     fallback = _FakeProvider("OPENROUTER", result="from openrouter")
     router = _router({"GEMINI": gemini, "OPENROUTER": fallback})
@@ -74,7 +100,9 @@ def test_does_not_fall_back_on_client_error():
     assert fallback.calls == 0
 
 
-def test_raises_when_no_provider_available():
+def test_raises_when_no_provider_available(monkeypatch):
+    monkeypatch.setattr(settings, "ai_chat_provider", "GEMINI")
+    monkeypatch.setattr(settings, "ai_fallback_provider", "OPENROUTER")
     with pytest.raises(AIUnavailableError):
         _router({}).run("chat", [{"role": "user", "content": "hi"}])
 

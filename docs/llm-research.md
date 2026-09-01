@@ -12,8 +12,17 @@ Measured on the free tiers (5 identical one-sentence summarisation calls each):
 |---|---|---|
 | Groq `openai/gpt-oss-20b` | 5/5 | 525 ms |
 | OpenRouter `openrouter/free` | 4/5 | 3,267 ms |
+| Gemini `gemini-flash-lite-latest` | 3/3 | 818 ms |
 | Gemini `gemini-flash-latest` | 3/5 | 27,386 ms |
 | Gemini `gemini-3.5-flash` | 0/5 | quota exhausted (20 requests/day) |
+
+Gemini's free-tier quota is **per model**, so the model id matters as much as the
+provider. `gemini-3.5-flash` allows 20 generate-content requests per day; the
+`-lite` variants have their own, far more usable allowance. `GEMINI_CHAT_MODEL`
+therefore defaults to the alias `gemini-flash-lite-latest` rather than a pinned
+id — three pinned ids used by earlier builds (`gemini-2.5-flash`,
+`gemini-2.0-flash`, `gemini-2.5-flash-lite`) now return 404, and an alias keeps
+working when Google retires a version.
 
 Groq is therefore the primary for every chat-style task. Gemini's free tier caps
 `gemini-3.5-flash` at 20 generate-content requests per day, which a news

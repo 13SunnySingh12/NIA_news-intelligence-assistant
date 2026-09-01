@@ -26,7 +26,7 @@ create a `.env` at the repo root containing the ones marked **Required**.
 | `NIA_RETENTION_CRON` | Spring Boot | Retention schedule (offset from ingestion) | Optional | Private |
 | `NIA_EMBED_MAX_PER_CYCLE` | Spring Boot | Cap on embeddings requested per ingestion cycle, to stay inside the embedding provider's rate limit | Optional (default 100) | Private |
 | `NIA_PERSONALIZATION_WEIGHTS` | Spring Boot | Feed scoring weights | Optional | Private |
-| `SUPABASE_URL` | Supabase config | Project URL (mirrors `VITE_SUPABASE_URL`) | Optional server-side | Private |
+| `SUPABASE_URL` | Spring Boot | Project URL. **Verifying Supabase JWTs depends on this** — the ES256 public keys are fetched from `<SUPABASE_URL>/auth/v1/.well-known/jwks.json`. Without it the app starts and reports healthy but every signed-in request returns 401 | **Required** | Private |
 | `SUPABASE_ANON_KEY` | Supabase config | Public anon key (mirrors `VITE_*`) | Optional server-side | Public value |
 | `SUPABASE_SERVICE_ROLE_KEY` | Backend (reserved) | Privileged Supabase ops; current code uses the direct DB connection instead | Optional | **Secret** |
 | `SUPABASE_JWT_SECRET` | Spring Boot | **Verify Supabase JWTs** (actively used) | **Required** | **Secret** |
@@ -55,8 +55,9 @@ create a `.env` at the repo root containing the ones marked **Required**.
 ## Startup validation
 
 - **Spring Boot** fails fast (naming the variable, never the value) if
-  `SUPABASE_JWT_SECRET` or `NIA_INTERNAL_TOKEN` is missing, and warns if no news
-  provider key is set.
+  `SUPABASE_URL`, `SUPABASE_JWT_SECRET` or `NIA_INTERNAL_TOKEN` is missing, or if
+  `NIA_INTERNAL_TOKEN` is still the placeholder, and warns if no news provider key
+  is set.
 - **FastAPI** warns clearly if the internal token is the default, if
   `DATABASE_URL` is unconfigured, or if no LLM key is present.
 - **Frontend** warns in the dev console (and disables auth gracefully) if

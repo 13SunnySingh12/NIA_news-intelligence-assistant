@@ -1,0 +1,33 @@
+# Normalize line endings so a checkout on Windows, macOS or Linux produces the
+# same bytes. Without this, `core.autocrlf=true` hands a Windows contributor
+# CRLF copies of the Dockerfiles and shell commands, which Docker and /bin/sh
+# can reject at build time.
+
+# Let Git decide for anything it detects as text.
+* text=auto
+
+# Files that must be LF everywhere, because a CR breaks the tool that reads them.
+*.sh              text eol=lf
+Dockerfile        text eol=lf
+*.Dockerfile      text eol=lf
+.dockerignore     text eol=lf
+.gitignore        text eol=lf
+*.yml             text eol=lf
+*.yaml            text eol=lf
+*.sql             text eol=lf
+mvnw              text eol=lf
+
+# Windows-only scripts stay CRLF.
+*.bat             text eol=crlf
+*.cmd             text eol=crlf
+
+# Binary: never touch, never diff as text.
+*.png             binary
+*.jpg             binary
+*.jpeg            binary
+*.gif             binary
+*.ico             binary
+*.woff            binary
+*.woff2           binary
+*.ttf             binary
+*.jar             binary

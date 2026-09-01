@@ -1,0 +1,74 @@
+server:
+  port: ${PORT:8080}   # Render injects PORT; fall back to 8080 for local dev
+  error:
+    include-message: never
+    include-stacktrace: never
+
+spring:
+  application:
+    name: nia-backend
+  datasource:
+    # Supabase Postgres connection (use the Session/Transaction pooler for IPv4).
+    # Project Settings -> Database -> Connection string (JDBC).
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 10000
+  jpa:
+    hibernate:
+      ddl-auto: none        # schema is owned by database/schema.sql, never by Hibernate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+# ---- NIA application config -------------------------------------------------
+nia:
+  cors:
+    allowed-origins: ${NIA_CORS_ALLOWED_ORIGINS:http://localhost:5173}
+  internal-token: ${NIA_INTERNAL_TOKEN:change-me}
+  fastapi-base-url: ${FASTAPI_BASE_URL:http://localhost:8000}
+  rag:
+    top-k: ${NIA_RAG_TOP_K:8}
+  personalization:
+    weights: ${NIA_PERSONALIZATION_WEIGHTS:0.5,0.25,0.15,0.1}
+  retention:
+    enabled: ${NIA_RETENTION_ENABLED:true}
+    # Articles older than this are deleted unless a user bookmarked or read them.
+    # The feed only ranks the last 48h and trending only 24h, so a few days is plenty.
+    article-days: ${NIA_ARTICLE_RETENTION_DAYS:7}
+    cron: ${NIA_RETENTION_CRON:0 5 * * * *}
+  rate-limit:
+    refresh-per-hour: 10
+    assistant-per-hour: 60
+  ingest:
+    enabled: ${NIA_INGEST_ENABLED:true}
+    cron: ${NIA_INGEST_CRON:0 0 */2 * * *}
+    categories: ${NIA_INGEST_CATEGORIES:technology,business,world,india,science,sports,health,entertainment,politics}
+    countries: ${NIA_INGEST_COUNTRIES:us,in,gb}
+    default-language: ${NIA_DEFAULT_LANGUAGE:en}
+    page-size: 10
+    embed-max-per-cycle: ${NIA_EMBED_MAX_PER_CYCLE:100}
+  news:
+    primary: ${NEWS_PROVIDER_PRIMARY:GNEWS}
+    secondary: ${NEWS_PROVIDER_SECONDARY:NEWSDATA}
+    fallback: ${NEWS_PROVIDER_FALLBACK:GUARDIAN,CURRENTS,GOOGLE_NEWS_RSS}
+    gnews-key: ${GNEWS_API_KEY:}
+    newsdata-key: ${NEWSDATA_API_KEY:}
+    guardian-key: ${GUARDIAN_API_KEY:}
+    currents-key: ${CURRENTS_API_KEY:}
+    newsapi-key: ${NEWSAPI_API_KEY:}
+
+supabase:
+  url: ${SUPABASE_URL:}
+  anon-key: ${SUPABASE_ANON_KEY:}
+  service-role-key: ${SUPABASE_SERVICE_ROLE_KEY:}
+  jwt-secret: ${SUPABASE_JWT_SECRET:}
+
+logging:
+  level:
+    com.nia: INFO
+    org.springframework.web: WARN

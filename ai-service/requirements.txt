@@ -1,0 +1,12 @@
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+httpx==0.28.1
+pydantic==2.10.4
+pydantic-settings==2.7.1
+psycopg[binary]==3.2.3
+psycopg-pool==3.2.4
+python-dotenv==1.0.1
+
+# Optional local embedding fallback (heavy: pulls in torch). Install only if you
+# set ENABLE_LOCAL_EMBED_FALLBACK=true and EMBED_DIM=384. See docs/architecture.md.
+# sentence-transformers==3.3.1

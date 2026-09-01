@@ -1,0 +1,92 @@
+# ---- Secrets / env ----
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.local
+
+# ---- Node / frontend ----
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vite/
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# ---- Local run copies (jar copied out of target/ so the IDE can rebuild it) ----
+/run/
+
+# ---- Java / Spring Boot ----
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*.class
+*.jar
+!**/maven-wrapper.jar
+hs_err_pid*
+
+# ---- Python / FastAPI ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.model/
+
+# ---- Local editor / assistant workspace config ----
+# Per-developer tooling state. Useful locally, not part of the project, and it
+# should never differ between contributors' checkouts.
+.aider*
+.claude/
+.continue/
+.cursor/
+.windsurf/
+
+# ---- IDE / OS ----
+.idea/
+.vscode/
+# ...but keep the shared Java/Maven import settings so the IDE resolves the
+# project correctly on a fresh clone.
+!.vscode/
+!.vscode/settings.json
+*.iml
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Logs ----
+*.log
+logs/
+
+# ---- Test / coverage output ----
+coverage/
+htmlcov/
+.coverage
+.coverage.*
+*.lcov
+frontend/coverage/
+
+# ---- Local database files ----
+*.sqlite
+*.sqlite3
+*.db
+
+# ---- Supabase local artifacts ----
+.supabase/
+supabase/.temp/
+supabase/.branches/
+
+# ---- Docker local overrides ----
+docker-compose.override.yml
+docker-compose.override.yaml
+
+# ---- Backup / temporary files ----
+*.bak
+*.orig
+*.rej
+*.tmp
+*~

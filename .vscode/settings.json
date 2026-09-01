@@ -1,0 +1,35 @@
+{
+  // Import this Maven project automatically. Without this the language server can
+  // fall out of sync and report every cross-package type as "cannot be resolved".
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.import.maven.enabled": true,
+  "java.maven.downloadSources": true,
+
+  // Eclipse JDT's optional null analysis is OFF. It is not part of Java
+  // compilation (javac reports 0 warnings for this project); it fires because our
+  // plain types are passed to Spring APIs declared @NonNull. Silencing it avoids
+  // ~30 false positives on values that cannot be null (UUID.fromString, Spring
+  // @PathVariable, records we construct ourselves). Real compile problems still
+  // surface normally.
+  "java.compile.nullAnalysis.mode": "disabled",
+
+  // Keep dependency/build folders out of the Java index so it stays fast and stable.
+  "java.import.exclusions": [
+    "**/node_modules/**",
+    "**/.venv/**",
+    "**/dist/**",
+    "**/target/**",
+    "**/__pycache__/**",
+    "**/.pytest_cache/**"
+  ],
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/.venv/**": true,
+    "**/target/**": true,
+    "**/dist/**": true
+  },
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.pytest_cache": true
+  }
+}

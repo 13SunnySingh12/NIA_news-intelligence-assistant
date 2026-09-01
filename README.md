@@ -22,7 +22,6 @@ NIA/
 ├── database/      schema.sql, rls.sql, migrations/
 ├── docker/        Dockerfiles + docker-compose for the two backends
 ├── docs/          architecture + provider notes
-├── .env.example   every environment variable, documented
 └── README.md
 ```
 
@@ -62,12 +61,15 @@ Secrets stay server-side. The browser only ever gets the Supabase URL + anon key
 
 ## 2. Configure environment
 
-There is **one** `.env` at the repo root, shared by all services. Copy
-`.env.example` to `.env` and fill in values. Loading: Spring Boot reads it via a
-small `EnvironmentPostProcessor`, FastAPI via `pydantic-settings`, and Vite via
-`envDir: '..'` — and Vite only exposes `VITE_*` keys to the browser, so backend
-secrets in the same file never reach the client. Never commit `.env`. See
-[docs/environment.md](docs/environment.md) for the full variable audit.
+There is **one** `.env` at the repo root, shared by all services. Create it and
+fill in the variables listed in
+[docs/environment.md](docs/environment.md) — that table gives every variable's
+purpose, whether it is required, and whether it is safe to expose.
+
+Loading: Spring Boot reads it via a small `EnvironmentPostProcessor`, FastAPI via
+`pydantic-settings`, and Vite via `envDir: '..'` — and Vite only exposes `VITE_*`
+keys to the browser, so backend secrets in the same file never reach the client.
+No `.env*` file is ever committed.
 
 Get free API keys as needed — see [`docs/api-research.md`](docs/api-research.md)
 and [`docs/llm-research.md`](docs/llm-research.md) for links.

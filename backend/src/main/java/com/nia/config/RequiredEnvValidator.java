@@ -36,7 +36,7 @@ public class RequiredEnvValidator {
         if (!missing.isEmpty()) {
             throw new IllegalStateException(
                     "Missing required environment variable(s): " + String.join(", ", missing)
-                            + ". Set them in the root .env (see .env.example). Values are never logged.");
+                            + ". Set them in the root .env (see docs/environment.md). Values are never logged.");
         }
 
         boolean anyNewsKey = !isBlank(nia.getNews().getGnewsKey())

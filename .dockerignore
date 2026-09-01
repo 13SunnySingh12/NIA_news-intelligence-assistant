@@ -12,11 +12,8 @@
 # ---- Secrets: must never reach a build context or an image layer ----
 .env
 .env.*
-!.env.example
 **/.env
 **/.env.local
-# .env.example is committed for humans; the image has no use for it.
-.env.example
 
 # ---- Version control ----
 .git

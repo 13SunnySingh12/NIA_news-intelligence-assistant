@@ -8,7 +8,8 @@ One file — the root `.env` — holds all configuration. Loading:
 - **Vite/React** — `envDir: '..'` loads the root `.env`, but **only `VITE_*` keys
   reach the browser bundle**; every other value stays server-side.
 
-`.env` is gitignored; `.env.example` is committed with placeholders only.
+No `.env*` file is committed. This table is the authoritative list of variables —
+create a `.env` at the repo root containing the ones marked **Required**.
 
 ## Audit
 

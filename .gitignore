@@ -1,7 +1,9 @@
 # ---- Secrets / env ----
+# Every .env* file stays local. The full list of variables — name, purpose,
+# whether it is required, and whether it is safe to expose — lives in
+# docs/environment.md instead of a committed template.
 .env
 .env.*
-!.env.example
 **/.env
 **/.env.local
 
@@ -13,7 +15,6 @@ dist-ssr/
 .vite/
 frontend/.env
 frontend/.env.*
-!frontend/.env.example
 
 # ---- Local run copies (jar copied out of target/ so the IDE can rebuild it) ----
 /run/

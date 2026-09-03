@@ -46,8 +46,15 @@ _ERROR_MESSAGES = {
 }
 
 
-@app.get("/health")
+@app.api_route("/health", methods=["GET", "HEAD"])
 def health() -> dict:
+    """Liveness probe.
+
+    HEAD is accepted as well as GET: uptime monitors commonly probe with HEAD,
+    and FastAPI's @app.get does not imply it (unlike Spring MVC, which adds HEAD
+    to @GetMapping automatically). Without this the service answers 405 and a
+    monitor reports a healthy container as down.
+    """
     return {"status": "ok", "service": "nia-ai-service"}
 
 

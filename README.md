@@ -33,8 +33,6 @@ quiet period can take up to a minute to wake up.)*
 - [Database](#database)
 - [Scheduled jobs](#scheduled-jobs)
 - [Deployment](#deployment)
-- [Troubleshooting](#troubleshooting)
-- [License](#license)
 - [Credits](#credits)
 
 ---
@@ -561,12 +559,8 @@ unless a user bookmarked or read them. This is what keeps storage inside a free
 Supabase plan — the feed only ranks the last 48 hours and trending only the last
 24, so a few days of history is plenty.
 
-On startup the log prints the parsed schedule and the next run times, so the
-cadence can be confirmed rather than assumed:
-
-```
-NIA ingestion scheduled | cron='0 0 */2 * * *' | next runs: 02:00, 04:00, 06:00
-```
+On startup the service logs the schedule it parsed and the upcoming run times, so
+the cadence can be confirmed rather than assumed.
 
 An `AtomicBoolean` prevents overlapping cycles, and each cycle logs a summary of
 providers, articles fetched, duplicates removed, new rows, embeddings generated,
@@ -601,30 +595,6 @@ Order matters:
 
 Both backend services read `PORT` from the environment, which is what Render
 injects.
-
----
-
-## Troubleshooting
-
-| Symptom | Cause and fix |
-| --- | --- |
-| Every signed-in request returns 401 | `SUPABASE_URL` is missing. Supabase signs access tokens with ES256 and the public keys come from `<SUPABASE_URL>/auth/v1/.well-known/jwks.json`. The backend refuses to start without it. |
-| Backend exits at startup naming a variable | Intentional. Required configuration is validated on boot and reported by name — never by value — instead of failing mysteriously later. |
-| Blank screen, console warns about missing config | `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` are unset. Authentication stays disabled until they are set. |
-| Frontend still calls localhost after deploying | `VITE_*` values are compiled in at build time. Set `VITE_API_BASE_URL` and rebuild. |
-| Requests blocked by CORS | Add the exact frontend origin (scheme + host, no trailing slash) to `NIA_CORS_ALLOWED_ORIGINS`. |
-| AI features report "unavailable" | No LLM key is configured, or every provider in the fallback chain failed. Set `GEMINI_API_KEY` and/or `GROQ_API_KEY`. |
-| Semantic search returns nothing while keyword works | Those articles have no embeddings yet. Embeddings are generated in a bounded batch per ingestion cycle (`NIA_EMBED_MAX_PER_CYCLE`) to respect free-tier rate limits, so a new corpus fills in over several cycles. |
-| Uptime monitor reports the AI service down | Probe `/health` with `GET` or `HEAD`; other methods correctly return 405. |
-| Feed stops updating overnight | The free-tier service went to sleep. See the scheduled-jobs caveat above. |
-| Embedding dimension mismatch | `articles.embedding` is fixed at `VECTOR(768)`. Changing the embedding model means migrating the column and re-embedding every row — one corpus cannot mix dimensions. |
-
----
-
-## License
-
-This repository does not currently include a license file. Without one, default
-copyright applies and no usage rights are granted.
 
 ---
 
